@@ -9,7 +9,8 @@ func main() {
 
 	dat, err := ioutil.ReadFile("test.txt")
 	if err == nil {
-		fmt.Println(dat)
+		s := string(dat)
+		fmt.Println(s)
 	}
 	err = ioutil.WriteFile("outfile.txt", dat, 0777)
 
