@@ -1,26 +1,33 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
-func BubbleSort(slice []int) {
-	fmt.Println(len(slice))
-	var finish int = 0
-	for i := 0; i < len(slice); i++ {
-		if slice[i] > slice[i+1] {
-			finish++
-			Swap(slice, i)
-			println(slice)
-		} else {
-			finish--
-		}
-	}
+var swapped = true
+
+func main() {
+	numbers := GetNumbers()
+	BubbleSort(numbers)
 }
 
-func Swap(slice []int, i int) error {
+/*BubbleSort function*/
+func BubbleSort(input []int) {
+	n := 10
+	for swapped {
+		swapped = false
+		for i := 1; i < n; i++ {
+			if input[i-1] > input[i] {
+				Swap(input, i)
+			}
+		}
+	}
+	fmt.Println(input)
+}
 
-	temp := slice[i+1]
-	slice[i+1] = slice[i]
-	slice[1] = temp
+func Swap(input []int, i int) {
+	input[i], input[i-1] = input[i-1], input[i]
+	swapped = true
 }
 
 /*GetNumbers get ten numbers from the user and it returns a slice*/
@@ -38,12 +45,4 @@ func GetNumbers() []int {
 		}
 	}
 	return numbersReceived
-}
-
-func main() {
-
-	firstSlice := GetNumbers()
-	fmt.Println(firstSlice)
-	BubbleSort(firstSlice)
-
 }
