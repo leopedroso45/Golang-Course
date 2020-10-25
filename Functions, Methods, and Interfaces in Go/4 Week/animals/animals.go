@@ -1,205 +1,202 @@
 package main
 
-import "fmt"
-
-type animal interface {
-	speak()
-	eat()
-	move()
-}
-
-type cow struct {
-	name       string
-	locomotion string
-	noise      string
-	eaten      string
-}
-
-func (c *cow) initit() {
-	c.locomotion = "walk"
-	c.noise = "moo"
-	c.eaten = "grass"
-}
-
-func (c *cow) speak() {
-	fmt.Println(c.noise)
-}
-func (c *cow) eat() {
-	fmt.Println(c.eaten)
-}
-func (c *cow) move() {
-	fmt.Println(c.locomotion)
-}
-
-type bird struct {
-	name       string
-	locomotion string
-	noise      string
-	eaten      string
-}
-
-func (b *bird) initit() {
-	b.locomotion = "fly"
-	b.noise = "peep"
-	b.eaten = "worms"
-}
-
-func (b *bird) speak() {
-	fmt.Println(b.noise)
-}
-func (b *bird) eat() {
-	fmt.Println(b.eaten)
-}
-func (b *bird) move() {
-	fmt.Println(b.locomotion)
-}
-
-type snake struct {
-	name       string
-	locomotion string
-	noise      string
-	eaten      string
-}
-
-func (s *snake) initit() {
-	s.locomotion = "slither"
-	s.noise = "hsss"
-	s.eaten = "mice"
-
-}
-
-func (s *snake) speak() {
-	fmt.Println(s.noise)
-}
-func (s *snake) eat() {
-	fmt.Println(s.eaten)
-}
-func (s *snake) move() {
-	fmt.Println(s.locomotion)
-}
-
-var (
-	cows   []cow
-	birds  []bird
-	snakes []snake
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
 )
 
+var (
+	colorGreen  = "\033[32m"
+	colorYellow = "\033[33m"
+	colorRed    = "\033[31m"
+	colorCyan   = "\033[36m"
+	colorReset  = "\033[0m"
+)
+
+/*Animal interface contain Eat, Move and Speak methods. */
+type Animal interface {
+	Eat()
+	Move()
+	Speak()
+	InitIt(string) Animal
+	GetName() string
+}
+
+/*Cow animal type that implements Animal */
+type Cow struct {
+	name       string
+	food       string
+	locomotion string
+	noise      string
+}
+
+/*Eat animal method */
+func (a *Cow) Eat() {
+	fmt.Println(string(colorGreen), a.name+": "+a.food, string(colorReset))
+}
+
+/*Move animal method */
+func (a *Cow) Move() {
+	fmt.Println(string(colorGreen), a.name+": "+a.locomotion, string(colorReset))
+}
+
+/*Speak animal method */
+func (a *Cow) Speak() {
+	fmt.Println(string(colorGreen), a.name+": "+a.noise, string(colorReset))
+}
+
+/*InitIt animal method */
+func (a *Cow) InitIt(name string) Animal {
+	a.name = name
+	a.food = "grass"
+	a.locomotion = "walk"
+	a.noise = "moo"
+	fmt.Println(string(colorCyan), "Created It!", string(colorReset))
+	return a
+}
+
+/*GetName animal method */
+func (a *Cow) GetName() string {
+	return a.name
+}
+
+/*Bird animal type that implements Animal */
+type Bird struct {
+	name       string
+	food       string
+	locomotion string
+	noise      string
+}
+
+/*Eat animal method */
+func (a *Bird) Eat() {
+	fmt.Println(string(colorYellow), a.name+": "+a.food, string(colorReset))
+}
+
+/*Move animal method */
+func (a *Bird) Move() {
+	fmt.Println(string(colorYellow), a.name+": "+a.locomotion, string(colorReset))
+}
+
+/*Speak animal method */
+func (a *Bird) Speak() {
+	fmt.Println(string(colorYellow), a.name+": "+a.noise, string(colorReset))
+}
+
+/*InitIt animal method */
+func (a *Bird) InitIt(name string) Animal {
+	a.name = name
+	a.food = "worms"
+	a.locomotion = "fly"
+	a.noise = "peep"
+	fmt.Println(string(colorCyan), "Created It!", string(colorReset))
+	return a
+}
+
+/*GetName animal method */
+func (a *Bird) GetName() string {
+	return a.name
+}
+
+/*Snake animal type that implements Animal */
+type Snake struct {
+	name       string
+	food       string
+	locomotion string
+	noise      string
+}
+
+/*Eat animal method */
+func (a *Snake) Eat() {
+	fmt.Println(string(colorRed), a.name+": "+a.food, string(colorReset))
+}
+
+/*Move animal method */
+func (a *Snake) Move() {
+	fmt.Println(string(colorRed), a.name+": "+a.locomotion, string(colorReset))
+}
+
+/*Speak animal method */
+func (a *Snake) Speak() {
+	fmt.Println(string(colorRed), a.name+": "+a.noise, string(colorReset))
+}
+
+/*InitIt animal method */
+func (a *Snake) InitIt(name string) Animal {
+	a.name = name
+	a.food = "mice"
+	a.locomotion = "slither"
+	a.noise = "hsss"
+	fmt.Println(string(colorCyan), "Created It!", string(colorReset))
+	return a
+}
+
+/*GetName animal method */
+func (a *Snake) GetName() string {
+	return a.name
+}
+
+var animals []Animal
+
 func main() {
-	condition := true
+	keepAlive := true
 	var action string
-	for ok := true; ok; ok = condition {
-		fmt.Println("Type a request, it can be a 'query' or 'newanimal':")
-		fmt.Scan(&action)
-		switch action {
-		case "query":
-			query()
-		case "newanimal":
-			newanimal()
+	for ok := true; ok; ok = keepAlive {
+		fmt.Println("Use 'newanimal' or 'query':")
+		fmt.Print(">")
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			action = scanner.Text()
+			break
 		}
+		commands := strings.Fields(action)
 
-	}
-}
+		if commands[0] == "query" {
+			for _, a := range animals {
+				n := a.GetName()
+				np := commands[1]
+				cmd := commands[2]
+				if n == np {
+					switch cmd {
+					case "eat":
+						a.Eat()
+					case "move":
+						a.Move()
+					case "speak":
+						a.Speak()
+					default:
+						fmt.Println("Can't undestand. Try again.")
+						return
+					}
+				}
+			}
+		} else if commands[0] == "newanimal" {
+			animalType := commands[2]
+			switch animalType {
+			case "cow":
+				var c Cow
+				var a Animal
+				a = c.InitIt(commands[1])
+				animals = append(animals, a)
+			case "bird":
+				var c Bird
+				var a Animal
+				a = c.InitIt(commands[1])
+				animals = append(animals, a)
+			case "snake":
+				var c Snake
+				var a Animal
+				a = c.InitIt(commands[1])
+				animals = append(animals, a)
+			default:
+				fmt.Println("Can't understand. Try again.")
+				return
+			}
 
-func newanimal() {
-	var name string
-	fmt.Println("Inform the animal name")
-	fmt.Scan(&name)
-	fmt.Println("Inform the animal type")
-	var typeAnimal string
-	fmt.Scan(&typeAnimal)
-	switch typeAnimal {
-	case "cow":
-		cowish := cow{
-			name: name,
+		} else {
+			fmt.Println("I can't understand. Try again.")
 		}
-		cowish.initit()
-		cows = append(cows, cowish)
-		fmt.Println("Created it!")
-		return
-	case "bird":
-		birdish := bird{
-			name: name,
-		}
-		birdish.initit()
-		birds = append(birds, birdish)
-		fmt.Println("Created it!")
-	case "snake":
-		snakeish := snake{
-			name: name,
-		}
-		snakeish.initit()
-		snakes = append(snakes, snakeish)
-		fmt.Println("Created it!")
-	default:
-		fmt.Println("I can't understand you, try again.")
-		return
-	}
-}
-
-func query() {
-	var name string
-	fmt.Println("Inform the animal name")
-	fmt.Scan(&name)
-	fmt.Println("Inform the animal type")
-	var typeAnimal string
-	fmt.Scan(&typeAnimal)
-	fmt.Println("Inform the animal action")
-	var action string
-	fmt.Scan(&action)
-	switch typeAnimal {
-	case "cow":
-		for _, cow := range cows {
-			if cow.name == name {
-				if action == "eat" {
-					cow.eat()
-					return
-				} else if action == "move" {
-					cow.move()
-					return
-				} else if action == "speak" {
-					cow.speak()
-					return
-				}
-			} else {
-				fmt.Println("Can't find it")
-			}
-		}
-	case "bird":
-		for _, bird := range birds {
-			if bird.name == name {
-				if action == "eat" {
-					bird.eat()
-					return
-				} else if action == "move" {
-					bird.move()
-					return
-				} else if action == "speak" {
-					bird.speak()
-					return
-				}
-			} else {
-				fmt.Println("Can't find it")
-			}
-		}
-	case "snake":
-		for _, snake := range snakes {
-			if snake.name == name {
-				if action == "eat" {
-					snake.eat()
-					return
-				} else if action == "move" {
-					snake.move()
-					return
-				} else if action == "speak" {
-					snake.speak()
-					return
-				}
-			} else {
-				fmt.Println("Can't find it")
-			}
-		}
-	default:
-		fmt.Println("Can't find it.")
-		return
 	}
 }
